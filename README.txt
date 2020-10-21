@@ -43,6 +43,6 @@ draw-stuff.js and styles.css were provided by Charles Siska
 
 Sample Invocation:
 
-![AsgwillangaPic1](https://github.com/WillTimani/AsgwillangaCavern/blob/master/Images/AsgwillangaPic1.png)
-![AsgwillangaPic2](https://github.com/WillTimani/AsgwillangaCavern/blob/master/Images/AsgwillangaPic2.png)
-![AsgwillangaPic3](https://github.com/WillTimani/AsgwillangaCavern/blob/master/Images/AsgwillangaPic3.png)
+![AsgwillangaPic1](https://github.com/WillTimani/AsgwillangaCavern/blob/main/Images/AsgwillangaPic1.png)
+![AsgwillangaPic2](https://github.com/WillTimani/AsgwillangaCavern/blob/main/Images/AsgwillangaPic2.png)
+![AsgwillangaPic3](https://github.com/WillTimani/AsgwillangaCavern/blob/main/Images/AsgwillangaPic3.png)

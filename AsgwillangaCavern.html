@@ -1,0 +1,293 @@
+<!doctype html><html><head>
+<title>Expedition Into the Asgwillanga Caverns</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body><h1>Asgwillanga Cavern</h1>
+<h4>Created By: William Timani</h4>
+
+<canvas id="square" width="600" height="1600"></canvas>
+
+</body>
+<script src="draw-stuff.js"></script>
+<script src="Converters.js"></script>
+<script src="room.js"></script>
+<script>
+
+//===================== Global Variables =======================// 
+
+var sumLimit = 16
+var idLimit = "G87"
+var visitedRooms = []; // keeps track of rooms that have been visited
+var kidQueue = [];	// keeps track of rooms to explore from 
+var closestRedisue = 32; // current closest room in terms of residue
+var x = 0;	
+var y = 0;
+var xReset = false;
+
+//==================== Functions ========================//
+
+// takes in a room and checks for all next rooms based on the Asgwillange Cavern rules 
+function nextRoom(currentRoom){
+
+	var newRoom = new room("000", 0, 0);
+
+	for(var i = 0; i <= charToInt(idLimit[0]); i++){
+		newRoom.change(0, i);
+		for(var j = 0; j <= charToInt(idLimit[1]); j++){
+			newRoom.change(1, j);
+			for(var k = 0; k <= charToInt(idLimit[2]); k++){
+				newRoom.change(2, k);
+				
+				if(newRoom.sum() == 16){ // Sum limit rule 
+
+					if(i == 0 || i == charToInt(idLimit[0]) && i != currentRoom.get(0)){ // id[0] is max or zero, id[1] or id[2] is the same
+						if(j == currentRoom.get(1) || k == currentRoom.get(2)){
+
+							if(checkVisitedRooms(newRoom) == -1){
+
+								kidQueue.push(new room(newRoom.id, newRoom.x, newRoom.y));
+							
+								drawNewRoom(kidQueue[kidQueue.length - 1], currentRoom);
+
+							} else {
+
+								drawConnection(visitedRooms[checkVisitedRooms(newRoom)] , currentRoom);
+
+								if(visitedRooms[checkVisitedRooms(newRoom)].id != closestRoom.id){
+									redraw(visitedRooms[checkVisitedRooms(newRoom)]);
+								}
+							
+							}
+
+
+						}
+ 
+					} else if(j == 0 || j == charToInt(idLimit[1]) && j != currentRoom.get(1)){ // id[1] is max or zero, id[0] or id[2] is the same
+						if(i == currentRoom.get(0) || k == currentRoom.get(2)){
+
+							if(checkVisitedRooms(newRoom) == -1){
+
+								kidQueue.push(new room(newRoom.id, newRoom.x, newRoom.y));
+								
+								drawNewRoom(kidQueue[kidQueue.length - 1], currentRoom);
+				
+							} else {
+
+								drawConnection(visitedRooms[checkVisitedRooms(newRoom)] , currentRoom);
+
+								if(visitedRooms[checkVisitedRooms(newRoom)].id != closestRoom.id){
+									redraw(visitedRooms[checkVisitedRooms(newRoom)]);
+								}
+							}
+
+						}
+
+					} else if(k == 0 || k == charToInt(idLimit[2]) && k != currentRoom.get(2)){ // id[2] is max or zero, id[0] or id[1] is the same
+						if(i == currentRoom.get(0) || j == currentRoom.get(1)){
+
+							if(checkVisitedRooms(newRoom) == -1){
+
+								kidQueue.push(new room(newRoom.id, newRoom.x, newRoom.y));
+						
+								drawNewRoom(kidQueue[kidQueue.length - 1], currentRoom);
+					
+							} else {
+
+								drawConnection(visitedRooms[checkVisitedRooms(newRoom)] , currentRoom);
+
+								if(visitedRooms[checkVisitedRooms(newRoom)].id != closestRoom.id){
+									redraw(visitedRooms[checkVisitedRooms(newRoom)]);
+								}
+							}
+
+						}
+
+					}
+
+				}
+
+			}
+
+		}
+
+	}
+
+}
+
+// checks if an inputted room has been visited
+// return -1 if it has not been visited otherwise return the index in visitedRooms[]
+function checkVisitedRooms(newRoom){
+
+	for(var a = 0; a < visitedRooms.length; a++){
+
+		if(visitedRooms[a].id == newRoom.id){
+			return a;
+		}
+
+	}
+
+	return -1; 
+
+}
+
+// draws a new room on the cavern map
+function drawNewRoom(nRoom, cRoom){
+
+	visitedRooms.push(kidQueue[kidQueue.length - 1]);
+
+	context.strokeStyle = "rgba(100,100,100,1.0)";
+	context.fillStyle = "rgba(100,100,100,1.0)";
+
+	nRoom.x = x;
+  	nRoom.y = 1600 - nRoom.residue() * 50;
+
+	if(closestRedisue > nRoom.residue()){
+
+		redraw(closestRoom);
+
+		closestRedisue = nRoom.residue();
+		closestRoom = visitedRooms[visitedRooms.length - 1];
+
+		context.strokeStyle = "white";
+		context.fillStyle = "#FF114C";
+
+	}
+
+	context.beginPath();
+
+	context.strokeStyle = "red";
+  	context.beginPath();
+
+  	if(xReset){
+  								
+  		context.moveTo(cRoom.x + 25, cRoom.y + 25);
+  		context.lineTo(nRoom.x + 50, nRoom.y + 25);
+  		context.stroke();
+  		xReset = false;
+
+  	} else {
+
+  		context.moveTo(cRoom.x + 25, cRoom.y + 25);
+  		context.lineTo(nRoom.x + 25, nRoom.y + 25);
+  		context.stroke();
+
+  	}
+
+  	context.closePath();
+
+  	context.strokeStyle = "black";
+  	context.beginPath();
+
+	context.arc(nRoom.x + 25, nRoom.y + 25, 25, 0, 2 * Math.PI);
+	context.stroke();
+	context.fill();
+
+  	context.fillStyle = "white";
+  	context.font = "10px Georgia";
+  	context.fillText(nRoom.format(), 5 + nRoom.x, 25 + nRoom.y);
+
+  	context.closePath();
+
+  	x += 80;
+
+  	if(x >= 550){
+
+  		//y += 60;
+  		x = 0; 
+
+  		xReset = true;
+
+
+  	}
+
+}
+
+// draws a back edge to a previsouly visited room
+function drawConnection(nRoom, cRoom){
+
+	context.strokeStyle = "green";
+  	context.beginPath();
+  	context.moveTo(cRoom.x + 25, cRoom.y + 25);
+  	context.lineTo(nRoom.x + 25, nRoom.y + 25);
+  	context.stroke();
+  	context.closePath();
+
+
+}
+
+// redraws a room in order to prevent overlapping lines 
+function redraw(r){
+
+	context.strokeStyle = "rgba(100,100,100,1.0)";
+	context.fillStyle = "rgba(100,100,100,1.0)";
+
+	context.beginPath();
+	context.arc(r.x + 25, r.y + 25, 25, 0, 2 * Math.PI);
+	context.stroke();
+	context.fill();
+	context.closePath();
+
+	context.fillStyle = "white";
+  	context.font = "10px Georgia";
+  	context.fillText(r.format(), 5 + r.x, 25 + r.y);
+
+
+}
+
+// ========================  Main ============================//
+
+  var canvas = document.getElementById( "square" );
+  var context = canvas.getContext( "2d" );
+
+ // draw residue lines on the cavern map
+  for(var i = 0; i <= 32; i++){
+
+  	context.strokeStyle = "white";
+  	context.beginPath();
+  	context.moveTo(0, i * 50);
+  	context.lineTo(600, i * 50);
+  	context.stroke();
+  	context.closePath();
+ 
+    context.fillStyle = "white";
+  	context.font = "16px Georgia";
+  	context.fillText("R = " + (32-i + 1), 550, i * 50 - 25);
+
+  }
+
+// push the starting room (16,0,0) to initialize the exploration
+  kidQueue.push(new room("G00",0,0));
+  visitedRooms.push(new room("G00", 0, 0));
+
+  var closestRoom = visitedRooms[0];
+
+// finds next room until there are no more rooms left in kidQueue
+// there is a half second delay between each movement
+  function theLoop() {
+  	setTimeout(function () {
+
+
+  		nextRoom(kidQueue.shift());
+
+  		if(kidQueue.length > 0){
+
+  			theLoop();
+
+  		}else{
+
+  			for(var i = 0; i < visitedRooms.length; i++){
+  				if(visitedRooms[i].id != closestRoom.id){
+  					redraw(visitedRooms[i]);
+  				}
+  			}
+  			console.log(closestRoom + " : " + closestRedisue);
+
+  		}
+  		
+  	}, 500)
+  }
+
+  theLoop(kidQueue.length);
+
+</script>
+</html>
